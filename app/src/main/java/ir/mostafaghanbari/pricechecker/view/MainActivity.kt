@@ -43,6 +43,8 @@ class MainActivity : ComponentActivity() {
                     launchScanner()
                 }, { id ->
                     mainViewModel.newItemScanned(id)
+                },{
+                    onBackPressed()
                 })
             }
         }
@@ -85,7 +87,8 @@ class MainActivity : ComponentActivity() {
 fun MyApp(
     viewModel: MainViewModel,
     onScan: () -> Unit,
-    onInsertIdentifier: (id: String) -> Unit
+    onInsertIdentifier: (id: String) -> Unit,
+    onBack:() -> Unit
 ) {
     val items: List<ItemModel> by viewModel.orderItems.observeAsState(listOf())
     val totalPrice: String by viewModel.totalPrice.observeAsState(initial = "$0")
@@ -113,7 +116,7 @@ fun MyApp(
                 onIncrease = { viewModel.increaseItemCounter(it.id) },
                 onDecrease = { viewModel.decreaseItemCounter(it.id) },
                 onDelete = { viewModel.onDelete(it) },
-                onBack = {})
+                onBack = onBack)
         }
     }
 }

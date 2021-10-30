@@ -89,7 +89,7 @@ class MainViewModel @Inject constructor(
 
         val total = price * (item?.count?.value ?: 1)
 
-        item?.totalPrice?.value = total.toString()
+        item?.totalPrice?.value = "$$total"
     }
 
     fun storeOrder() {

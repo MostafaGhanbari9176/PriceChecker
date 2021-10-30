@@ -194,7 +194,7 @@ fun BottomOfTheItem(
     ) {
 
         Text(
-            text = "$${data.totalPrice.value}",
+            text = data.totalPrice.value,
             style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
             modifier = Modifier.weight(1f)
         )
