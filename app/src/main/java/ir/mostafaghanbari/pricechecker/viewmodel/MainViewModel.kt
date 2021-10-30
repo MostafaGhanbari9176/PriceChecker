@@ -1,13 +1,11 @@
 package ir.mostafaghanbari.pricechecker.viewmodel
 
 import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.mostafaghanbari.pricechecker.model.ItemModel
 import ir.mostafaghanbari.pricechecker.model.RoomDB
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,8 +13,16 @@ class MainViewModel @Inject constructor(
     private val db: RoomDB
 ) : ViewModel() {
 
-    val actionErrors = MutableLiveData<String>()
-    val orderItems = MutableLiveData<MutableList<ItemModel>>(mutableListOf())
+    private val _actionErrors = MutableLiveData<String>()
+    val actionErrors:LiveData<String> = _actionErrors
+
+    private val _orderItems = MutableLiveData(listOf<ItemModel>())
+    val orderItems: LiveData<List<ItemModel>> = _orderItems
+
+    private val _showDeleteDialog = MutableLiveData(false)
+    val showDeleteDialog:LiveData<Boolean> = _showDeleteDialog
+
+
     val totalPrice: LiveData<String> = Transformations.map(orderItems) { orderItems ->
         var price = 0
 
@@ -32,7 +38,6 @@ class MainViewModel @Inject constructor(
 
         "$price$"
     }
-    val showDeleteDialog = MutableLiveData(false)
 
 
     fun newItemScanned(id: String) {
@@ -44,28 +49,31 @@ class MainViewModel @Inject constructor(
     }
 
     private fun addItemToOrder(id: String) {
-        val item = db.itemsDAO().selectItem(id)
-        if (item == null)
-            actionErrors.value = ActionErrors.ItemNotFound.name
-        else
-            orderItems.value?.add(item)
+        viewModelScope.launch{
+            val item = db.itemsDAO().selectItem(id)
+            if (item == null)
+                _actionErrors.value = ActionErrors.ItemNotFound.name
+            else {
+                _orderItems.value = listOf(item).plus(_orderItems.value ?: listOf())
+            }
+        }
     }
 
     fun increaseItemCounter(id: String) {
         val item = orderItems.value?.find { i -> i.id == id }
-        item?.count?.value?.plus(1)
+        item?.count?.value = item?.count?.value?.inc() ?: 1
     }
 
     fun decreaseItemCounter(id: String) {
         val item = orderItems.value?.find { i -> i.id == id }
         if (item?.count?.value == 1) {
-            showDeleteDialog.value = true
+            _showDeleteDialog.value = true
         } else {
             item?.count?.value?.minus(1)
         }
     }
 
-    fun storeOrder(){
+    fun storeOrder() {
         //todo
     }
 

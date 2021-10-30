@@ -1,5 +1,8 @@
 package ir.mostafaghanbari.pricechecker.model
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
@@ -10,15 +13,16 @@ data class ItemModel(
     val name: String,
     val qrUrl: String,
     val thumbnail: String,
-    val price: String,
+    val price: String
+){
     @Ignore
-    var count: MutableLiveData<Int> = MutableLiveData(1)
-)
+    var count: MutableState<Int> = mutableStateOf(1)
+}
 
 @Dao
 interface ItemsDAO {
 
     @Query("select * from Items where id == :id")
-    fun selectItem(id: String): ItemModel?
+    suspend fun selectItem(id: String): ItemModel?
 
 }
