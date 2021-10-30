@@ -41,10 +41,9 @@ class MainActivity : ComponentActivity() {
             PriceCheckerTheme {
                 MyApp(mainViewModel, {
                     launchScanner()
-                }, {
-
-                }
-                )
+                }, { id ->
+                    mainViewModel.newItemScanned(id)
+                })
             }
         }
     }
@@ -75,10 +74,11 @@ class MainActivity : ComponentActivity() {
 fun MyApp(
     viewModel: MainViewModel,
     onScan: () -> Unit,
-    onInsertIdentifier: () -> Unit
+    onInsertIdentifier: (id: String) -> Unit
 ) {
     val items: List<ItemModel> by viewModel.orderItems.observeAsState(listOf())
     val totalPrice: String by viewModel.totalPrice.observeAsState(initial = "$0")
+    val showDeleteDialog: Boolean by viewModel.showDeleteDialog.observeAsState(false)
 
     val navController = rememberNavController()
 
@@ -93,12 +93,14 @@ fun MyApp(
         composable("list") {
             BasketPage(
                 items = items,
-                totalPrice,
-                onScan,
-                onInsertIdentifier,
-                { viewModel.increaseItemCounter(it.id) },
-                { viewModel.decreaseItemCounter(it.id) },
-                {})
+                totalPrice = totalPrice,
+                showDeleteDialog = showDeleteDialog,
+                onScan = onScan,
+                onInsertIdentifier = onInsertIdentifier,
+                onIncrease = { viewModel.increaseItemCounter(it.id) },
+                onDecrease = { viewModel.decreaseItemCounter(it.id) },
+                onDelete = { viewModel.onDelete(it) },
+                onBack = {})
         }
     }
 }

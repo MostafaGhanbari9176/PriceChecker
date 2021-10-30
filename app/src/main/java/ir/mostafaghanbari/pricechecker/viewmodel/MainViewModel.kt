@@ -25,6 +25,8 @@ class MainViewModel @Inject constructor(
     private val _totalPrice = MutableLiveData("$0")
     val totalPrice = _totalPrice
 
+    private var itemOnVergeOfDeletion = ""
+
 
     private fun changeTotalPrice(increase: Boolean, amountString: String?) {
         val currentPriceString = totalPrice.value?.replace("$", "")
@@ -71,6 +73,7 @@ class MainViewModel @Inject constructor(
     fun decreaseItemCounter(id: String) {
         val item = orderItems.value?.find { i -> i.id == id }
         if (item?.count?.value == 1) {
+            itemOnVergeOfDeletion = id
             _showDeleteDialog.value = true
         } else {
             item?.count?.value = item?.count?.value?.dec() ?: 1
@@ -80,6 +83,20 @@ class MainViewModel @Inject constructor(
 
     fun storeOrder() {
         //todo
+    }
+
+    fun onDelete(delete: Boolean) {
+        _showDeleteDialog.value = false
+
+        if (delete) {
+            val item = orderItems.value?.find { i -> i.id == itemOnVergeOfDeletion }
+
+            _orderItems.value = _orderItems.value?.filter { i -> i.id != itemOnVergeOfDeletion }
+
+            changeTotalPrice(false, item?.price)
+        }
+
+        itemOnVergeOfDeletion = ""
     }
 
     enum class ActionErrors {

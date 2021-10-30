@@ -12,7 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Remove
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,21 +32,42 @@ import ir.mostafaghanbari.pricechecker.view.theme.PriceCheckerTheme
 fun BasketPage(
     items: List<ItemModel>,
     totalPrice: String,
+    showDeleteDialog: Boolean,
     onScan: () -> Unit,
-    onInsertIdentifier: () -> Unit,
+    onInsertIdentifier: (id:String) -> Unit,
     onIncrease: (ItemModel) -> Unit,
     onDecrease: (ItemModel) -> Unit,
+    onDelete: (delete: Boolean) -> Unit,
     onBack: () -> Unit
 ) {
+
+    var showInsertIdentifierDialog by remember {
+        mutableStateOf(false)
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxSize(),
         color = MaterialTheme.colors.primaryVariant,
     ) {
         Column {
+
+            if (showDeleteDialog)
+                Dialog(onDismissRequest = { onDelete(false) }) {
+                    DialogDeleteItem(onOk = { onDelete(true) }, onCancel = { onDelete(false) })
+                }
+
+            if (showInsertIdentifierDialog)
+                Dialog(onDismissRequest = { showInsertIdentifierDialog = false }) {
+                    DialogInsertIdentifier(
+                        onOk = { showInsertIdentifierDialog = false; onInsertIdentifier(it)},
+                        onCancel = { showInsertIdentifierDialog = false }
+                    )
+                }
+
             AppBar(totalPrice, onBack)
             ItemList(items, onIncrease, onDecrease, Modifier.weight(1f))
-            Buttons(onScan, onInsertIdentifier)
+            Buttons(onScan, {showInsertIdentifierDialog = true})
         }
     }
 }
@@ -274,7 +295,7 @@ fun PreviewOfBasketPage() {
                     "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/red-apple_1f34e.png",
                     "$100"
                 )
-            ), "", {}, {}, {}, {}, {})
+            ), "", false, {}, {}, {}, {}, {}, {})
     }
 }
 
