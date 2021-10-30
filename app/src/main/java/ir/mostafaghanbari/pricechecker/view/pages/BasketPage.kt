@@ -92,7 +92,7 @@ fun Buttons(onScan: () -> Unit, onInsertIdentifier: () -> Unit) {
         horizontalArrangement = Arrangement.Center
     ) {
         Button(
-            onClick = { /*TODO*/ }, modifier = Modifier
+            onClick = onInsertIdentifier, modifier = Modifier
                 .padding(end = 4.dp)
                 .weight(0.5f)
         ) {

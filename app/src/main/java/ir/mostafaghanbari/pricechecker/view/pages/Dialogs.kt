@@ -8,7 +8,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,14 +21,14 @@ fun DialogInsertIdentifier(
     onOk: (id: String) -> Unit,
     onCancel: () -> Unit
 ) {
-    var id = ""
+    var id by remember { mutableStateOf("") }
     Card(elevation = 6.dp) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "Please Insert Item Identifier")
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = "",
+                value = id,
                 onValueChange = { id = it },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
                 label = { Text(text = "Id") }

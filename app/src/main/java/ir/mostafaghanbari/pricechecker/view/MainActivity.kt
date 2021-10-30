@@ -85,10 +85,12 @@ fun MyApp(
     NavHost(
         modifier = Modifier.fillMaxSize(),
         navController = navController,
-        startDestination = "list"
+        startDestination = "main"
     ) {
         composable("main") {
-            MainPage()
+            MainPage {
+                navController.navigate("list")
+            }
         }
         composable("list") {
             BasketPage(
