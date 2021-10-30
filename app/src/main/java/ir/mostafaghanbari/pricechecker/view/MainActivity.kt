@@ -7,9 +7,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,6 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ir.mostafaghanbari.pricechecker.model.ItemModel
 import ir.mostafaghanbari.pricechecker.view.pages.BasketPage
 import ir.mostafaghanbari.pricechecker.view.pages.MainPage
+import ir.mostafaghanbari.pricechecker.view.theme.PriceCheckerTheme
 import ir.mostafaghanbari.pricechecker.viewmodel.MainViewModel
 
 @AndroidEntryPoint
@@ -35,8 +38,13 @@ class MainActivity : ComponentActivity() {
         initScannerLauncher()
 
         setContent {
-            MyApp(mainViewModel) {
-                launchScanner()
+            PriceCheckerTheme {
+                MyApp(mainViewModel, {
+                    launchScanner()
+                }, {
+
+                }
+                )
             }
         }
     }
@@ -64,17 +72,33 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyApp(viewModel: MainViewModel, onScan: () -> Unit) {
+fun MyApp(
+    viewModel: MainViewModel,
+    onScan: () -> Unit,
+    onInsertIdentifier: () -> Unit
+) {
     val items: List<ItemModel> by viewModel.orderItems.observeAsState(listOf())
+    val totalPrice: String by viewModel.totalPrice.observeAsState(initial = "$0")
 
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "list") {
+    NavHost(
+        modifier = Modifier.fillMaxSize(),
+        navController = navController,
+        startDestination = "list"
+    ) {
         composable("main") {
             MainPage()
         }
         composable("list") {
-            BasketPage(items = items, onScan)
+            BasketPage(
+                items = items,
+                totalPrice,
+                onScan,
+                onInsertIdentifier,
+                { viewModel.increaseItemCounter(it.id) },
+                { viewModel.decreaseItemCounter(it.id) },
+                {})
         }
     }
 }
