@@ -46,6 +46,17 @@ class MainActivity : ComponentActivity() {
                 })
             }
         }
+
+        observeData()
+
+    }
+
+    private fun observeData() {
+        mainViewModel.actionErrors.observe(this){message ->
+            if(!message.isNullOrEmpty()){
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun initScannerLauncher() {
@@ -53,7 +64,7 @@ class MainActivity : ComponentActivity() {
             object : ActivityResultCallback<ScanIntentResult> {
                 override fun onActivityResult(result: ScanIntentResult?) {
                     if (result?.contents == null)
-                        Toast.makeText(this@MainActivity, "Failed", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_LONG).show()
                     else
                         mainViewModel.newItemScanned(result.contents)
                 }
@@ -64,7 +75,7 @@ class MainActivity : ComponentActivity() {
         scannerLauncher.launch(ScanOptions().apply {
             this.setOrientationLocked(false)
             this.setBarcodeImageEnabled(true)
-            this.setPrompt("Prompt")
+            this.setPrompt("fix QrCode on center of screen")
         })
     }
 
