@@ -68,6 +68,7 @@ class MainViewModel @Inject constructor(
         val item = orderItems.value?.find { i -> i.id == id }
         item?.count?.value = item?.count?.value?.inc() ?: 1
         changeTotalPrice(true, item?.price)
+        calculateItemTotalPrice(item)
     }
 
     fun decreaseItemCounter(id: String) {
@@ -78,7 +79,17 @@ class MainViewModel @Inject constructor(
         } else {
             item?.count?.value = item?.count?.value?.dec() ?: 1
             changeTotalPrice(false, item?.price)
+            calculateItemTotalPrice(item)
         }
+    }
+
+    private fun calculateItemTotalPrice(item: ItemModel?) {
+        val priceString = item?.price?.replace("$", "")
+        val price = priceString?.toFloat() ?: 0f
+
+        val total = price * (item?.count?.value ?: 1)
+
+        item?.totalPrice?.value = total.toString()
     }
 
     fun storeOrder() {

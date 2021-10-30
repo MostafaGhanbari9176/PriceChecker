@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.room.*
 
 @Entity(tableName = "Items")
@@ -17,6 +18,8 @@ data class ItemModel(
 ){
     @Ignore
     var count: MutableState<Int> = mutableStateOf(1)
+    @Ignore
+    var totalPrice: MutableState<String> = mutableStateOf(price)
 }
 
 @Dao
